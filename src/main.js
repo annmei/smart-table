@@ -1,54 +1,113 @@
-import './fonts/ys-display/fonts.css'
-import './style.css'
+import './fonts/ys-display/fonts.css';
+import './style.css';
 
-import {data as sourceData} from "./data/dataset_1.js";
+import { data as sourceData } from "./data/dataset_1.js";
 
-import {initData} from "./data.js";
-import {processFormData} from "./lib/utils.js";
+import { initData } from "./data.js";
+import { processFormData } from "./lib/utils.js";
 
-import {initTable} from "./components/table.js";
-// @todo: подключение
+import { initTable } from "./components/table.js";
+import { initPagination } from "./components/pagination.js";
+import { initSorting } from "./components/sorting.js";
+import { initFiltering } from "./components/filtering.js";
+import { initSearching } from "./components/searching.js";
 
-
-// Исходные данные используемые в render()
-const {data, ...indexes} = initData(sourceData);
+// Исходные данные 
+const { data } = initData(sourceData);
 
 /**
- * Сбор и обработка полей из таблицы
- * @returns {Object}
+ * Сбор состояния формы
  */
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
 
+    const rowsPerPage = parseInt(state.rowsPerPage);
+    const page = parseInt(state.page ?? 1);
+
     return {
-        ...state
+        ...state,
+        rowsPerPage,
+        page
     };
 }
 
 /**
- * Перерисовка состояния таблицы при любых изменениях
- * @param {HTMLButtonElement?} action
+ * Рендер таблицы
  */
 function render(action) {
-    let state = collectState(); // состояние полей из таблицы
-    let result = [...data]; // копируем для последующего изменения
-    // @todo: использование
+    let state = collectState();
+    let query = {};
 
+    // обработка данных перед запросом
+    query = applySearching(query, state, action);
+    query = applyFiltering(query, state, action);
+    query = applySorting(query, state, action);
+    query = applyPagination(query, state, action);
 
-    sampleTable.render(result)
+    // пока локально (без API)
+    sampleTable.render(data);
 }
 
-const sampleTable = initTable({
-    tableTemplate: 'table',
-    rowTemplate: 'row',
-    before: [],
-    after: []
-}, render);
+/**
+ * Таблица
+ */
+const sampleTable = initTable(
+    {
+        tableTemplate: "table",
+        rowTemplate: "row",
+        before: ["search", "header", "filter"],
+        after: ["pagination"],
+    },
+    render,
+);
 
-// @todo: инициализация
+/**
+ * Инициализация модулей
+ */
 
+// поиск
+const applySearching = initSearching("search");
 
+// фильтрация
+const { applyFiltering, updateIndexes } = initFiltering(sampleTable.filter.elements);
+
+// сортировка
+const applySorting = initSorting([
+    sampleTable.header.elements.sortByDate,
+    sampleTable.header.elements.sortByTotal,
+]);
+
+// пагинация
+const { applyPagination, updatePagination } = initPagination(
+    sampleTable.pagination.elements,
+    (el, page, isCurrent) => {
+        const input = el.querySelector("input");
+        const label = el.querySelector("span");
+
+        input.value = page;
+        input.checked = isCurrent;
+        label.textContent = page;
+
+        return el;
+    }
+);
+
+/**
+ * DOM
+ */
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
 
-render();
+/**
+ * Индексы + init
+ */
+async function init() {
+    const api = initData(sourceData);
+    const indexes = await api.getIndexes();
+
+    updateIndexes(sampleTable.filter.elements, {
+        searchBySeller: indexes.sellers
+    });
+}
+
+init().then(render);
