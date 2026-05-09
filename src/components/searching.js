@@ -1,22 +1,21 @@
 /**
  * Инициализация поиска
- * @param {string} searchField - имя (name) DOM элемента, использующегося в качестве поля для поиска (должно быть ключом в state)
- * @returns {function} - функция обновления query запроса
+ * @param {string} searchField - имя DOM элемента (должно совпадать с ключом в state)
+ * @returns {function} - функция обновления query 
  */
 export function initSearching(searchField) {
     /**
-     * Функция обновляет query-параметры для http-запроса при наличии значения в поле поиска
-     * @param {object} query - исходные query-параметры http-запроса
-     * @param {object} state - исходное состояние таблицы. должен содержать ключ, соответствующий searchField для работыы поиска
-     * @returns {object} - обновленный query (или исходный, если поиск не требуется)
+     * Обновление query параметров при наличии значения в поле поиска
+     * @param {object} query - текущие query параметры
+     * @param {object} state - текущее состояние таблицы
+     * @returns {object} - обновлённый query
      */
     const newQuery = (query, state) => {
         return state[searchField]
-            ? Object.assign({}, query, {
-                  // проверяем, что в поле поиска было что-то введено
-                  search: state[searchField], // устанавливаем в query параметр
+            ? Object.assign({}, query, {   
+                search: state[searchField],
             })
-            : query; // если поле с поиском пустое, просто возвращаем query без изменений
+            : query; 
     };
 
     return newQuery;
