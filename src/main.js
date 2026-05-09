@@ -1,7 +1,7 @@
 import './fonts/ys-display/fonts.css';
 import './style.css';
 
-import { data as sourceData } from "./data/dataset_1.js";
+// import { data as sourceData } from "./data/dataset_1.js";
 
 import { initData } from "./data.js";
 import { processFormData } from "./lib/utils.js";
@@ -13,7 +13,7 @@ import { initFiltering } from "./components/filtering.js";
 import { initSearching } from "./components/searching.js";
 
 // Исходные данные 
-const { data } = initData(sourceData);
+const api = initData(sourceData);
 
 /**
  * Сбор состояния формы
@@ -34,7 +34,7 @@ function collectState() {
 /**
  * Рендер таблицы
  */
-function render(action) {
+async function render(action) {
     let state = collectState();
     let query = {};
 
@@ -43,9 +43,13 @@ function render(action) {
     query = applyFiltering(query, state, action);
     query = applySorting(query, state, action);
     query = applyPagination(query, state, action);
-
-    // пока локально (без API)
-    sampleTable.render(data);
+    
+    // запрашиваем данные с собранными параметрами
+    const { total, items } = await api.getRecords(query); 
+    
+    // перерисовываем пагинатор
+    updatePagination(total, query); 
+    sampleTable.render(items);
 }
 
 /**
@@ -102,7 +106,6 @@ appRoot.appendChild(sampleTable.container);
  * Индексы + init
  */
 async function init() {
-    const api = initData(sourceData);
     const indexes = await api.getIndexes();
 
     updateIndexes(sampleTable.filter.elements, {
