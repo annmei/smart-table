@@ -1,5 +1,3 @@
-import { makeIndex } from "./lib/utils.js";
-
 const BASE_URL = 'https://webinars.webdev.education-services.ru/sp7-api';
 
 export function initData() {
@@ -37,17 +35,17 @@ export function initData() {
             ]);
 
             // преобразование массивов в объект-индекс
-            sellers = makeIndex(
-                sellers,
-                'id',
-                value => `${value.first_name} ${value.last_name}`
-            );
+            // sellers = makeIndex(
+            //     sellers,
+            //     'id',
+            //     value => `${value.first_name} ${value.last_name}`
+            // );
 
-            customers = makeIndex(
-                customers,
-                'id',
-                value => `${value.first_name} ${value.last_name}`
-            );
+            // customers = makeIndex(
+            //     customers,
+            //     'id',
+            //     value => `${value.first_name} ${value.last_name}`
+            // );
         }
 
         return {

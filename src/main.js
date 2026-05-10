@@ -1,8 +1,6 @@
 import './fonts/ys-display/fonts.css';
 import './style.css';
 
-import { data as sourceData } from "./data/dataset_1.js";
-
 import { initData } from "./data.js";
 import { processFormData } from "./lib/utils.js";
 
@@ -69,18 +67,6 @@ const sampleTable = initTable(
  * Инициализация модулей
  */
 
-// поиск
-const applySearching = initSearching("search");
-
-// фильтрация
-const { applyFiltering, updateIndexes } = initFiltering(sampleTable.filter.elements);
-
-// сортировка
-const applySorting = initSorting([
-    sampleTable.header.elements.sortByDate,
-    sampleTable.header.elements.sortByTotal,
-]);
-
 // пагинация
 const { applyPagination, updatePagination } = initPagination(
     sampleTable.pagination.elements,
@@ -95,6 +81,18 @@ const { applyPagination, updatePagination } = initPagination(
         return el;
     }
 );
+
+// сортировка
+const applySorting = initSorting([
+    sampleTable.header.elements.sortByDate,
+    sampleTable.header.elements.sortByTotal,
+]);
+
+// фильтрация
+const { applyFiltering, updateIndexes } = initFiltering(sampleTable.filter.elements);
+
+// поиск
+const applySearching = initSearching("search");
 
 /**
  * DOM
