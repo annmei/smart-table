@@ -41,7 +41,7 @@ async function render(action) {
     // обработка данных перед запросом
     query = applySearching(query, state, action);
     query = applyFiltering(query, state, action);
-    query = applySorting(query, state, action);
+    query = applySorting(query, action);
     query = applyPagination(query, state, action);
     
     // запрашиваем данные с собранными параметрами
