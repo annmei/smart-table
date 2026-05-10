@@ -1,4 +1,4 @@
-// import { makeIndex } from "./lib/utils.js";
+import { makeIndex } from "./lib/utils.js";
 
 const BASE_URL = 'https://webinars.webdev.education-services.ru/sp7-api';
 

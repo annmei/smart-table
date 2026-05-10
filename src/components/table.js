@@ -2,11 +2,11 @@ import { cloneTemplate } from "../lib/utils.js";
 
 /**
  * Инициализирует таблицу и вызывает коллбэк при любых изменениях и нажатиях на кнопки
- *
  * @param {Object} settings
  * @param {(action: HTMLButtonElement | undefined) => void} onAction
  * @returns {{container: Node, elements: *, render: render}}
  */
+
 export function initTable(settings, onAction) {
     const { tableTemplate, rowTemplate, before, after } = settings;
     const root = cloneTemplate(tableTemplate);
@@ -14,11 +14,12 @@ export function initTable(settings, onAction) {
     //вывести дополнительные шаблоны до и после таблицы
     before.reverse().forEach((el) => {
         root[el] = cloneTemplate(el);
-        root.container.prepend(root[el].container);
+        root.container.prepend(root[el].container); // добавляем до таблицы
     });
+
     after.forEach((el) => {
         root[el] = cloneTemplate(el);
-        root.container.append(root[el].container);
+        root.container.append(root[el].container); // добавляем после таблицы
     });
 
     //обработать события и вызвать onAction()
@@ -37,19 +38,19 @@ export function initTable(settings, onAction) {
         }
     });
 
-    // преобразовать данные в строки таблицы по шаблону
+   // преобразовать данные в строки таблицы по шаблону
     const render = (data) => {
-        const nextRows = data.map((item) => {
-            const row = cloneTemplate(rowTemplate);
-            Object.keys(item).forEach((key) => {
-                if (Object.keys(row.elements).includes(key)) {
-                    row.elements[key].textContent = item[key];
-                }
-            });
-            return row.container;
+    const nextRows = data.map((item) => {
+        const row = cloneTemplate(rowTemplate);
+        Object.keys(item).forEach((key) => {
+            if (Object.keys(row.elements).includes(key)) {
+                row.elements[key].textContent = item[key];
+            }
         });
-        root.elements.rows.replaceChildren(...nextRows);
-    };
+        return row.container;
+    });
+    root.elements.rows.replaceChildren(...nextRows);
+};
 
-    return { ...root, render };
+return { ...root, render };
 }
